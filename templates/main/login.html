@@ -1,0 +1,18 @@
+{% block content %}
+
+{% if msg %}
+    <script>
+        alert('{{msg}}')
+    </script>
+{% endif %}
+
+<form action="{% url 'main:home' %}" method="post">
+    {% csrf_token %}
+    Email :
+    <input type="email" name="email" />
+    Password:
+    <input type="password" name="pass" />
+    <input type="submit" value="LogIn" />
+</form>
+
+{% endblock %}
