@@ -2,5 +2,13 @@
 
 {% csrf_token %}
 {{email}}
+<br/>
+<br/>
+{% for o in order %}
+    {{o}}
+    <br/>
+{% endfor %}
+<br/><br/><br/>
+{{order1}}
 
 {% endblock %}
