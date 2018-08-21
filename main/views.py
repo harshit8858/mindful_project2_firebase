@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-import firebase_admin
-from firebase_admin import credentials, db
+from django.http import HttpResponse
+
 import pyrebase
 from .forms import *
 
@@ -12,25 +12,9 @@ config = {
     'storageBucket' : "try-project-e4f24.appspot.com",
     'messagingSenderId' : "864587093826"
 }
-cred = credentials.Cert('C:\Users\Harshit Verma\Downloads\try-project-e4f24-6163c6fe2d67.json')
-firebase_admin.initialize_app(cred, {
-    'databaseURL' : "https://try-project-e4f24.firebaseio.com",
-})
 firebase = pyrebase.initialize_app(config)
 auth = firebase.auth()
-d_b = firebase.database()
-
-root = db.reference()
-new_user = root.child('users').push({
-    'name': 'Admin1',
-    'since': 1997
-})
-
-new_user.update({'since':1998})
-
-admin1 = db.reference('user/{0}'.format(new_user.key)).get()
-print('Name:',admin1['name'])
-print('Since:',admin1['since'])
+db = firebase.database()
 
 def login(request):
     return render(request, "main/login.html")
@@ -41,15 +25,28 @@ def home(request):
     email = request.POST.get('email')
     passw = request.POST.get("pass")
     try:
-        user = auth.sign_in_with_email_and_password(email,passw)
+        u = auth.sign_in_with_email_and_password(email,passw)
     except:
         message = "invalid cerediantials"
         return render(request,"main/login.html",{"msg":message})
-    print(user)
-    return render(request, "main/home.html",{"email":email, 'order':order})
+    print(u)
+    data = {
+        "name": "Mortimer 'Morty' Smith"
+    }
+    results = db.child("us").push(data, u['idToken'])
+    return render(request, "main/home.html",{"email":email, 'order':order, 'data':data, 'result':results})
+
+
+def try1(request):
+    data = {
+        "name": "Mortimer 'Morty' Smith"
+    }
+    results = db.child("users").push(data, u['idToken'])
+    return render(request, 'main/try1.html', {'data':data, 'result':results})
 
 
 def order(request):
+    order1 = db.child("Order").get().val()
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -57,4 +54,4 @@ def order(request):
             return redirect('main:home')
     else:
         form = OrderForm()
-    return render(request, 'main/order.html', {'form':form})
+    return render(request, 'main/order.html', {'form':form, 'order1':order1})
