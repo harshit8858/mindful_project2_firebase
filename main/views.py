@@ -37,14 +37,6 @@ def home(request):
     return render(request, "main/home.html",{"email":email, 'order':order, 'data':data, 'result':results})
 
 
-def try1(request):
-    data = {
-        "name": "Mortimer 'Morty' Smith"
-    }
-    results = db.child("users").push(data, u['idToken'])
-    return render(request, 'main/try1.html', {'data':data, 'result':results})
-
-
 def order(request):
     order1 = db.child("Order").get().val()
     if request.method == 'POST':
